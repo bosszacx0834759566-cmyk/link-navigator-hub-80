@@ -257,11 +257,10 @@ function RegionTile({ tile }: { tile: EarthTile }) {
   return (
     <mesh scale={1.0006} renderOrder={1}>
       <sphereGeometry args={[...args]} />
-      <meshStandardMaterial
+      <meshBasicMaterial
         map={map}
-        metalness={0.05}
-        roughness={0.82}
-        color="#e6eef5"
+        toneMapped={false}
+        color="#ffffff"
         polygonOffset
         polygonOffsetFactor={-1}
       />
