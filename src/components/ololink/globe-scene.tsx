@@ -2140,79 +2140,6 @@ function SceneContent({
         <Earth />
       </Suspense>
 
-      <OrbitDriver state={state} live={live} />
-
-      {/* live pass contact beams intentionally hidden */}
-
-
-      {/* orbital trajectory rings hidden along with the LEO fleet */}
-
-      {/* GLOBAL — operational regions and the trunk between them */}
-      <Fade show={!detailed}>
-        {REGIONS.map((r) => (
-          <RegionMarker
-            key={r.id}
-            region={r}
-            counts={regionCounts[r.id]!}
-            onFocus={(reg) => {
-              select(null);
-              setView(presetView(reg.id as PresetId) ?? pointView(new THREE.Vector3(...geoOnShell(reg.lat, reg.lon, 1.06)), 1.95, 24));
-            }}
-          />
-        ))}
-        {REGIONS[0] && REGIONS[1] && <TrunkRoute a={REGIONS[0]} b={REGIONS[1]} />}
-      </Fade>
-
-      {/* REGIONAL / LOCAL — altitude ladder above the operational region */}
-      <Fade show={detailed}>
-        {scopedRegions.map((r) => (
-          <LayerScaffold key={r.id} region={r} detailed={localView} />
-        ))}
-      </Fade>
-
-
-      {/* AI rerouting: old path dissolves, new path draws itself in */}
-      {layers.routes && detailed && previousRoute && previousRoute.length > 0 && (
-        <>
-          <ProgressiveRoute
-            key={`out-${rerouteSeq}`}
-            segments={previousRoute.filter((sg) => ASSET_BY_ID[sg.from]?.kind !== 'satellite')}
-            seq={rerouteSeq}
-            mode="out"
-            color="#94a3b8"
-          />
-          <ProgressiveRoute
-            key={`in-${rerouteSeq}`}
-            segments={route.filter((sg) => ASSET_BY_ID[sg.from]?.kind !== 'satellite')}
-            seq={rerouteSeq}
-            mode="in"
-            color="#e0f2fe"
-          />
-        </>
-      )}
-
-      {visibleAssets.map((a) => (
-        <AssetNode
-          key={a.id}
-          asset={a}
-          selected={selection?.type === 'asset' && selection.id === a.id}
-          onRoute={routeAssets.has(a.id)}
-          onSelect={select}
-          showLabel={
-            layers.labels &&
-            (detailed
-              ? routeAssets.has(a.id) || windowSats.has(a.id) || a.kind !== 'satellite'
-              : routeAssets.has(a.id) && a.kind === 'satellite')
-          }
-          detail={localView}
-          tether={detailed && a.altKm > 0 && a.kind !== 'satellite'}
-          live={live}
-          linking={windowSats.has(a.id) || windowReceivers.has(a.id)}
-        />
-      ))}
-
-      {layers.weather && visibleWeather.map((c) => <WeatherBlob key={c.id} cell={c} />)}
-
       <OrbitControls
         ref={controls}
         enablePan={false}
@@ -2235,7 +2162,6 @@ function SceneContent({
           onPresetDone();
         }}
       />
-      <LabelProjector tier={lod.level} />
     </>
   );
 }
