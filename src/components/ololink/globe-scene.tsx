@@ -300,16 +300,10 @@ function Earth() {
 
   return (
     <group>
-      {/* realistic surface: NASA Blue Marble 8K albedo, sun-lit */}
+      {/* surface: NASA Blue Marble albedo, unlit so the whole globe is evenly visible */}
       <mesh>
         <sphereGeometry args={[1, 128, 128]} />
-        <meshStandardMaterial
-          map={day}
-          roughnessMap={spec}
-          metalness={0.05}
-          roughness={0.82}
-          color="#e6eef5"
-        />
+        <meshBasicMaterial map={day} toneMapped={false} color="#ffffff" />
       </mesh>
 
       {/* high-resolution regional imagery */}
@@ -319,30 +313,6 @@ function Earth() {
         </Suspense>
       ) : null}
 
-      {/* city lights — additive, masked to the night hemisphere only */}
-      <mesh scale={1.001}>
-        <sphereGeometry args={[1, 96, 96]} />
-        <shaderMaterial
-          transparent
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          uniforms={{ uMap: { value: night }, uSun: { value: SUN_DIR } }}
-          vertexShader={`
-            varying vec2 vUv; varying vec3 vN;
-            void main() {
-              vUv = uv; vN = normalize(mat3(modelMatrix) * normal);
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }`}
-          fragmentShader={`
-            uniform sampler2D uMap; uniform vec3 uSun;
-            varying vec2 vUv; varying vec3 vN;
-            void main() {
-              float nightMask = smoothstep(0.12, -0.22, dot(vN, normalize(uSun)));
-              vec3 c = texture2D(uMap, vUv).rgb;
-              gl_FragColor = vec4(c * vec3(1.0, 0.82, 0.55) * nightMask * 0.9, 1.0);
-            }`}
-        />
-      </mesh>
 
       {/* cloud layer */}
       <mesh ref={cloudRef} scale={1.006}>
