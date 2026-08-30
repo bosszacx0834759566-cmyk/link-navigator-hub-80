@@ -2132,7 +2132,7 @@ function SceneContent({
         intensity={0.16}
         color="#2b4a72"
       />
-      <Stars radius={90} depth={40} count={2200} factor={2.6} saturation={0} fade speed={0.3} />
+      
 
       <LodDriver onChange={setLod} />
 
