@@ -271,23 +271,15 @@ function RegionTile({ tile }: { tile: EarthTile }) {
 function Earth() {
   const gl = useThree((s) => s.gl);
   const { level, region } = useLod();
-  const maps = useLoader(THREE.TextureLoader, [
-    EARTH_8K_URL,
-    earthNight,
-    earthClouds,
-    earthSpec,
-  ]);
+  const maps = useLoader(THREE.TextureLoader, [EARTH_8K_URL, earthClouds]);
   const day = maps[0]!;
-  const night = maps[1]!;
-  const clouds = maps[2]!;
-  const spec = maps[3]!;
+  const clouds = maps[1]!;
 
   useMemo(() => {
     const maxAniso = gl.capabilities.getMaxAnisotropy();
     tuneEarthTexture(day, maxAniso);
-    tuneEarthTexture(night, maxAniso);
     tuneEarthTexture(clouds, maxAniso, false);
-  }, [day, night, clouds, gl]);
+  }, [day, clouds, gl]);
 
   /** regional + local views get the native-resolution imagery tile */
   const tile = level !== 'global' && region ? EARTH_TILE_BY_REGION[region] : undefined;
