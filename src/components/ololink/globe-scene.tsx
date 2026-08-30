@@ -15,9 +15,7 @@ import {
 import * as THREE from 'three';
 
 import { EARTH_8K_URL, EARTH_TILE_BY_REGION, type EarthTile } from '@/lib/earth-textures';
-import earthNight from '@/assets/earth_lights_2048.png';
 import earthClouds from '@/assets/earth_clouds_1024.png';
-import earthSpec from '@/assets/earth_specular_2048.jpg';
 
 import {
   ASSET_BY_ID,
@@ -257,11 +255,10 @@ function RegionTile({ tile }: { tile: EarthTile }) {
   return (
     <mesh scale={1.0006} renderOrder={1}>
       <sphereGeometry args={[...args]} />
-      <meshStandardMaterial
+      <meshBasicMaterial
         map={map}
-        metalness={0.05}
-        roughness={0.82}
-        color="#e6eef5"
+        toneMapped={false}
+        color="#ffffff"
         polygonOffset
         polygonOffsetFactor={-1}
       />
@@ -272,23 +269,15 @@ function RegionTile({ tile }: { tile: EarthTile }) {
 function Earth() {
   const gl = useThree((s) => s.gl);
   const { level, region } = useLod();
-  const maps = useLoader(THREE.TextureLoader, [
-    EARTH_8K_URL,
-    earthNight,
-    earthClouds,
-    earthSpec,
-  ]);
+  const maps = useLoader(THREE.TextureLoader, [EARTH_8K_URL, earthClouds]);
   const day = maps[0]!;
-  const night = maps[1]!;
-  const clouds = maps[2]!;
-  const spec = maps[3]!;
+  const clouds = maps[1]!;
 
   useMemo(() => {
     const maxAniso = gl.capabilities.getMaxAnisotropy();
     tuneEarthTexture(day, maxAniso);
-    tuneEarthTexture(night, maxAniso);
     tuneEarthTexture(clouds, maxAniso, false);
-  }, [day, night, clouds, gl]);
+  }, [day, clouds, gl]);
 
   /** regional + local views get the native-resolution imagery tile */
   const tile = level !== 'global' && region ? EARTH_TILE_BY_REGION[region] : undefined;
@@ -300,16 +289,10 @@ function Earth() {
 
   return (
     <group>
-      {/* realistic surface: NASA Blue Marble 8K albedo, sun-lit */}
+      {/* surface: NASA Blue Marble albedo, unlit so the whole globe is evenly visible */}
       <mesh>
         <sphereGeometry args={[1, 128, 128]} />
-        <meshStandardMaterial
-          map={day}
-          roughnessMap={spec}
-          metalness={0.05}
-          roughness={0.82}
-          color="#e6eef5"
-        />
+        <meshBasicMaterial map={day} toneMapped={false} color="#ffffff" />
       </mesh>
 
       {/* high-resolution regional imagery */}
@@ -319,42 +302,18 @@ function Earth() {
         </Suspense>
       ) : null}
 
-      {/* city lights — additive, masked to the night hemisphere only */}
-      <mesh scale={1.001}>
-        <sphereGeometry args={[1, 96, 96]} />
-        <shaderMaterial
-          transparent
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          uniforms={{ uMap: { value: night }, uSun: { value: SUN_DIR } }}
-          vertexShader={`
-            varying vec2 vUv; varying vec3 vN;
-            void main() {
-              vUv = uv; vN = normalize(mat3(modelMatrix) * normal);
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }`}
-          fragmentShader={`
-            uniform sampler2D uMap; uniform vec3 uSun;
-            varying vec2 vUv; varying vec3 vN;
-            void main() {
-              float nightMask = smoothstep(0.12, -0.22, dot(vN, normalize(uSun)));
-              vec3 c = texture2D(uMap, vUv).rgb;
-              gl_FragColor = vec4(c * vec3(1.0, 0.82, 0.55) * nightMask * 0.9, 1.0);
-            }`}
-        />
-      </mesh>
 
       {/* cloud layer */}
       <mesh ref={cloudRef} scale={1.006}>
         <sphereGeometry args={[1, 96, 96]} />
-        <meshStandardMaterial
+        <meshBasicMaterial
           map={clouds}
           alphaMap={clouds}
           transparent
           opacity={0.42}
           depthWrite={false}
-          color="#dfe7ee"
-          roughness={1}
+          toneMapped={false}
+          color="#ffffff"
         />
       </mesh>
       {/* inner atmosphere */}
@@ -2119,19 +2078,9 @@ function SceneContent({
 
   return (
     <>
-      {/* sun: gives a visible day / night terminator across both regions */}
-      <ambientLight intensity={0.22} />
-      <directionalLight
-        position={[SUN_DIR.x * 6, SUN_DIR.y * 6, SUN_DIR.z * 6]}
-        intensity={3.1}
-        color="#fff6e8"
-      />
-      {/* faint night-side fill so the dark hemisphere stays readable */}
-      <directionalLight
-        position={[-SUN_DIR.x * 6, -SUN_DIR.y * 6, -SUN_DIR.z * 6]}
-        intensity={0.16}
-        color="#2b4a72"
-      />
+      {/* uniform ambient lighting only — no day/night terminator, no shadows */}
+      <ambientLight intensity={3.2} />
+
       
 
       <LodDriver onChange={setLod} />
