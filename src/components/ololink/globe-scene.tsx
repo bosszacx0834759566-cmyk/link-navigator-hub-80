@@ -2119,19 +2119,9 @@ function SceneContent({
 
   return (
     <>
-      {/* sun: gives a visible day / night terminator across both regions */}
-      <ambientLight intensity={0.22} />
-      <directionalLight
-        position={[SUN_DIR.x * 6, SUN_DIR.y * 6, SUN_DIR.z * 6]}
-        intensity={3.1}
-        color="#fff6e8"
-      />
-      {/* faint night-side fill so the dark hemisphere stays readable */}
-      <directionalLight
-        position={[-SUN_DIR.x * 6, -SUN_DIR.y * 6, -SUN_DIR.z * 6]}
-        intensity={0.16}
-        color="#2b4a72"
-      />
+      {/* uniform ambient lighting only — no day/night terminator, no shadows */}
+      <ambientLight intensity={3.2} />
+
       
 
       <LodDriver onChange={setLod} />
