@@ -2145,7 +2145,7 @@ function SceneContent({
       {/* live pass contact beams intentionally hidden */}
 
 
-      {layers.orbits && SATELLITES.map((a) => <OrbitTrack key={a.id} elId={a.id} />)}
+      {/* orbital trajectory rings hidden along with the LEO fleet */}
 
       {/* GLOBAL — operational regions and the trunk between them */}
       <Fade show={!detailed}>
