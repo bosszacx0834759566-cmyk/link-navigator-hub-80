@@ -306,14 +306,14 @@ function Earth() {
       {/* cloud layer */}
       <mesh ref={cloudRef} scale={1.006}>
         <sphereGeometry args={[1, 96, 96]} />
-        <meshStandardMaterial
+        <meshBasicMaterial
           map={clouds}
           alphaMap={clouds}
           transparent
           opacity={0.42}
           depthWrite={false}
-          color="#dfe7ee"
-          roughness={1}
+          toneMapped={false}
+          color="#ffffff"
         />
       </mesh>
       {/* inner atmosphere */}
