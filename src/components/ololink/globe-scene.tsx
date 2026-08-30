@@ -2055,15 +2055,19 @@ function SceneContent({
     [activeRegion]
   );
 
-  /** progressive reveal: only surface + orbital tiers exist at global range */
+  /** ground stations, HAPS, drones and LEO satellites are hidden */
   const visibleAssets = useMemo(
     () =>
       ASSETS.filter((a) => {
-        const region = regionIdOf(a);
-        if (a.kind === 'satellite') return true;
-        if (a.kind === 'ground') return true;
+        if (
+          a.kind === 'satellite' ||
+          a.kind === 'ground' ||
+          a.kind === 'haps' ||
+          a.kind === 'drone'
+        )
+          return false;
         if (!detailed) return false;
-        return inScope(region);
+        return inScope(regionIdOf(a));
       }),
     [detailed, inScope]
   );
@@ -2141,7 +2145,7 @@ function SceneContent({
       {/* live pass contact beams intentionally hidden */}
 
 
-      {layers.orbits && SATELLITES.map((a) => <OrbitTrack key={a.id} elId={a.id} />)}
+      {/* orbital trajectory rings hidden along with the LEO fleet */}
 
       {/* GLOBAL — operational regions and the trunk between them */}
       <Fade show={!detailed}>
