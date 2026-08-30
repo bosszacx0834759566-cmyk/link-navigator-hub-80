@@ -1459,11 +1459,6 @@ function GroundStation({ s, color }: { s: number; color: string }) {
 
 
 function CustomerNode({ s, color }: { s: number; color: string }) {
-  const ring = useRef<THREE.Mesh>(null);
-  useFrame((_, d) => {
-    if (ring.current) ring.current.rotation.z += d * 0.6;
-  });
-  const spokes = [0, 1, 2, 3, 4].map((i) => (i / 5) * Math.PI * 2);
   return (
     <group>
       {/* endpoint hub */}
@@ -1471,19 +1466,6 @@ function CustomerNode({ s, color }: { s: number; color: string }) {
         <boxGeometry args={[s * 0.6, s * 0.6, s * 0.6]} />
         <meshBasicMaterial color={color} />
       </mesh>
-      {/* distribution ring with spokes */}
-      <group position={[0, s * 0.08, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <mesh ref={ring}>
-          <torusGeometry args={[s * 1, s * 0.045, 6, 28]} />
-          <meshBasicMaterial color="#94a3b8" />
-        </mesh>
-        {spokes.map((a) => (
-          <mesh key={a} position={[Math.cos(a) * s * 1, Math.sin(a) * s * 1, 0]}>
-            <boxGeometry args={[s * 0.18, s * 0.18, s * 0.18]} />
-            <meshBasicMaterial color="#cbd5e1" />
-          </mesh>
-        ))}
-      </group>
     </group>
   );
 }
