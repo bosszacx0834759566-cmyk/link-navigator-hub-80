@@ -14,12 +14,12 @@
  * to the GPU.
  */
 
-import blueMarble8kUrl from '@/assets/earth-blue-marble-8k.jpg';
+import blueMarbleAsset from '@/assets/earth-bmng-5400.jpg.asset.json';
 import tileThailandUrl from '@/assets/earth-tile-thailand.jpg';
 import tileUnitedStatesUrl from '@/assets/earth-tile-united-states.jpg';
 
-/** Global 8K equirectangular albedo. */
-export const EARTH_8K_URL: string = blueMarble8kUrl;
+/** Global equirectangular albedo (NASA Blue Marble 5400x2700). */
+export const EARTH_8K_URL: string = blueMarbleAsset.url;
 
 export interface EarthTile {
   /** region id from REGIONS */
