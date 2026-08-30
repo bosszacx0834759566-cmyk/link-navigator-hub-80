@@ -369,7 +369,6 @@ export function MapScene({ state }: { state: OloLinkState }) {
         </g>
 
 
-        <rect width={MAP_W} height={MAP_H} fill="url(#map-vignette)" pointerEvents="none" />
       </svg>
 
 
